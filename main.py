@@ -87,7 +87,7 @@ class PlayerBullet(pygame.sprite.Sprite):
     def __init__(self, start_x, start_y):
         super().__init__(all_sprites)
         self.add(player_bullets)
-        self.image = pygame.transform.scale(load_image('player_bullet.png', colorkey=-1), (10, 20))
+        self.image = pygame.transform.scale(load_image('player_bullet.png', colorkey=-1), (5, 20))
         self.rect = self.image.get_rect()
         self.rect.x = start_x
         self.rect.y = start_y
