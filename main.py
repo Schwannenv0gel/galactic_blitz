@@ -36,8 +36,10 @@ def load_image(name, colorkey=None):
 
 
 def load_level(filename):
-    pass
-
+    filename = r"data/" + filename
+    with open(filename, encoding='utf8') as csvfile:
+        reader = csv.reader(csvfile, delimiter=';', quotechar='"')
+        lev_map = list(reader)
 
 def enemy_appear():
     pass
