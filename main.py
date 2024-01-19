@@ -132,10 +132,12 @@ class Enemy1(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = start_x
         self.rect.y = start_y
+        # self.score = 10
 
     def update(self):
         if pygame.sprite.spritecollideany(self, player_bullets):
             self.hp -= pygame.sprite.spritecollideany(self, player_bullets).damage
+            pygame.sprite.spritecollideany(self, player_bullets).kill()
         if self.hp == 0 or pygame.sprite.spritecollideany(self, horizontal_borders):
             if self.bonus_type == 'life':
                 LifeBonus(self.rect.x + 12, self.rect.y + 12)
@@ -167,10 +169,12 @@ class Enemy2(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = start_x
         self.rect.y = start_y
+        # self.score = 20
 
     def update(self):
         if pygame.sprite.spritecollideany(self, player_bullets):
             self.hp -= pygame.sprite.spritecollideany(self, player_bullets).damage
+            pygame.sprite.spritecollideany(self, player_bullets).kill()
         if self.hp == 0 or pygame.sprite.spritecollideany(self, horizontal_borders):
             if self.bonus_type == 'life':
                 LifeBonus(self.rect.x + 12, self.rect.y + 12)
@@ -201,10 +205,12 @@ class Enemy3(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = start_x
         self.rect.y = start_y
+        # self.score = 30
 
     def update(self):
         if pygame.sprite.spritecollideany(self, player_bullets):
             self.hp -= pygame.sprite.spritecollideany(self, player_bullets).damage
+            pygame.sprite.spritecollideany(self, player_bullets).kill()
         if self.hp == 0 or pygame.sprite.spritecollideany(self, horizontal_borders):
             if self.bonus_type == 'life':
                 LifeBonus(self.rect.x + 12, self.rect.y + 12)
@@ -313,7 +319,7 @@ def create_particles(position):
     # количество создаваемых частиц
     particle_count = 20
     # возможные скорости
-    numbers = range(-5, 6)
+    numbers = [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5]
     for _ in range(particle_count):
         Particle(position, random.choice(numbers), random.choice(numbers))
 
@@ -367,32 +373,26 @@ def main_menu():
     lev1_button_rect = pygame.Rect(50, 50, 100, 50)
     lev1_font = pygame.font.Font(None, 60)
     lev1_text = lev1_font.render('1', True, pygame.Color('#ffffff'))
-    lev1_button_color = pygame.Color('#1E90FF')
 
     lev2_button_rect = pygame.Rect(250, 50, 100, 50)
     lev2_font = pygame.font.Font(None, 60)
     lev2_text = lev2_font.render('2', True, pygame.Color('#ffffff'))
-    lev2_button_color = pygame.Color('#1E90FF')
 
     lev3_button_rect = pygame.Rect(450, 50, 100, 50)
     lev3_font = pygame.font.Font(None, 60)
     lev3_text = lev3_font.render('3', True, pygame.Color('#ffffff'))
-    lev3_button_color = pygame.Color('#1E90FF')
 
     lev4_button_rect = pygame.Rect(50, 200, 100, 50)
     lev4_font = pygame.font.Font(None, 60)
     lev4_text = lev4_font.render('4', True, pygame.Color('#ffffff'))
-    lev4_button_color = pygame.Color('#1E90FF')
 
     lev5_button_rect = pygame.Rect(250, 200, 100, 50)
     lev5_font = pygame.font.Font(None, 60)
     lev5_text = lev5_font.render('5', True, pygame.Color('#ffffff'))
-    lev5_button_color = pygame.Color('#1E90FF')
 
     lev6_button_rect = pygame.Rect(450, 200, 100, 50)
     lev6_font = pygame.font.Font(None, 60)
     lev6_text = lev6_font.render('6', True, pygame.Color('#ffffff'))
-    lev6_button_color = pygame.Color('#1E90FF')
 
     screen.fill(pygame.Color('#000000'))
 
@@ -403,7 +403,8 @@ def main_menu():
             if event.type == pygame.QUIT:
                 sys.exit(0)
             if event.type == pygame.KEYDOWN:
-                final_window()
+                if event.key == pygame.K_BACKSPACE:
+                    final_window()
 
         if lev1_button_rect.collidepoint(pygame.mouse.get_pos()):
             lev1_button_color = pygame.Color('#FF0000')
@@ -471,6 +472,27 @@ def main_menu():
     final_window()
 
 
+# def scoreboard(score):
+#     font = pygame.font.Font(None, 60)
+#
+#     text = font.render(f'Счёт: {score}', True, pygame.Color('#ffffff'))
+#
+#     running = True
+#
+#     while running:
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:
+#                 sys.exit(0)
+#             if event.type == pygame.KEYDOWN:
+#                 if event.key == pygame.K_RETURN or event.key == pygame.K_RETURN:
+#                     running = False
+#
+#         screen.fill(pygame.Color('#000000'))
+#         screen.blit(text, (200, 200))
+#
+#         pygame.display.flip()
+
+
 def level1():
     Border(5, 5, width - 5, 5)
     baseborder = Border(5, height - 70, width - 5, height - 70)
@@ -501,6 +523,8 @@ def level1():
             if event.type == sprite_appear:
                 enemy_appear(lev_map[cnt])
                 cnt += 1
+                if cnt == 12:
+                    running = False
 
         if pygame.key.get_pressed()[pygame.K_LEFT] or pygame.key.get_pressed()[pygame.K_a]:
             spaceship.update('left')
@@ -513,7 +537,7 @@ def level1():
 
         if pygame.sprite.spritecollideany(baseborder, enemies):
             spaceship.basehp -= 1
-        if spaceship.hp == 0:
+        if spaceship.hp <= 0:
             create_particles((spaceship.rect.x + 25, spaceship.rect.y + 25))
             spaceship.kill()
             gameover('Корабль уничтожен!')
@@ -572,6 +596,8 @@ def level2():
             if event.type == sprite_appear:
                 enemy_appear(lev_map[cnt])
                 cnt += 1
+                if cnt == 12:
+                    running = False
 
         if pygame.key.get_pressed()[pygame.K_LEFT] or pygame.key.get_pressed()[pygame.K_a]:
             spaceship.update('left')
@@ -584,7 +610,7 @@ def level2():
 
         if pygame.sprite.spritecollideany(baseborder, enemies):
             spaceship.basehp -= 1
-        if spaceship.hp == 0:
+        if spaceship.hp <= 0:
             create_particles((spaceship.rect.x + 25, spaceship.rect.y + 25))
             spaceship.kill()
             gameover('Корабль уничтожен!')
@@ -592,6 +618,7 @@ def level2():
             gameover('База уничтожена!')
 
         player_bullets.update()
+        enemies.update()
         bonuses.update()
         particles.update()
 
@@ -642,6 +669,8 @@ def level3():
             if event.type == sprite_appear:
                 enemy_appear(lev_map[cnt])
                 cnt += 1
+                if cnt == 12:
+                    running = False
 
         if pygame.key.get_pressed()[pygame.K_LEFT] or pygame.key.get_pressed()[pygame.K_a]:
             spaceship.update('left')
@@ -654,7 +683,7 @@ def level3():
 
         if pygame.sprite.spritecollideany(baseborder, enemies):
             spaceship.basehp -= 1
-        if spaceship.hp == 0:
+        if spaceship.hp <= 0:
             create_particles((spaceship.rect.x + 25, spaceship.rect.y + 25))
             spaceship.kill()
             gameover('Корабль уничтожен!')
@@ -662,6 +691,7 @@ def level3():
             gameover('База уничтожена!')
 
         player_bullets.update()
+        enemies.update()
         bonuses.update()
         particles.update()
 
@@ -712,6 +742,8 @@ def level4():
             if event.type == sprite_appear:
                 enemy_appear(lev_map[cnt])
                 cnt += 1
+                if cnt == 12:
+                    running = False
 
         if pygame.key.get_pressed()[pygame.K_LEFT] or pygame.key.get_pressed()[pygame.K_a]:
             spaceship.update('left')
@@ -724,7 +756,7 @@ def level4():
 
         if pygame.sprite.spritecollideany(baseborder, enemies):
             spaceship.basehp -= 1
-        if spaceship.hp == 0:
+        if spaceship.hp <= 0:
             create_particles((spaceship.rect.x + 25, spaceship.rect.y + 25))
             spaceship.kill()
             gameover('Корабль уничтожен!')
@@ -732,6 +764,7 @@ def level4():
             gameover('База уничтожена!')
 
         player_bullets.update()
+        enemies.update()
         bonuses.update()
         particles.update()
 
@@ -782,6 +815,8 @@ def level5():
             if event.type == sprite_appear:
                 enemy_appear(lev_map[cnt])
                 cnt += 1
+                if cnt == 12:
+                    running = False
 
         if pygame.key.get_pressed()[pygame.K_LEFT] or pygame.key.get_pressed()[pygame.K_a]:
             spaceship.update('left')
@@ -794,7 +829,7 @@ def level5():
 
         if pygame.sprite.spritecollideany(baseborder, enemies):
             spaceship.basehp -= 1
-        if spaceship.hp == 0:
+        if spaceship.hp <= 0:
             create_particles((spaceship.rect.x + 25, spaceship.rect.y + 25))
             spaceship.kill()
             gameover('Корабль уничтожен!')
@@ -802,6 +837,7 @@ def level5():
             gameover('База уничтожена!')
 
         player_bullets.update()
+        enemies.update()
         bonuses.update()
         particles.update()
 
@@ -852,6 +888,8 @@ def level6():
             if event.type == sprite_appear:
                 enemy_appear(lev_map[cnt])
                 cnt += 1
+                if cnt == 12:
+                    running = False
 
         if pygame.key.get_pressed()[pygame.K_LEFT] or pygame.key.get_pressed()[pygame.K_a]:
             spaceship.update('left')
@@ -864,7 +902,7 @@ def level6():
 
         if pygame.sprite.spritecollideany(baseborder, enemies):
             spaceship.basehp -= 1
-        if spaceship.hp == 0:
+        if spaceship.hp <= 0:
             create_particles((spaceship.rect.x + 25, spaceship.rect.y + 25))
             spaceship.kill()
             gameover('Корабль уничтожен!')
@@ -872,6 +910,7 @@ def level6():
             gameover('База уничтожена!')
 
         player_bullets.update()
+        enemies.update()
         bonuses.update()
         particles.update()
 
@@ -894,7 +933,7 @@ def level6():
 
 def final_window():
     ask_font = pygame.font.Font(None, 60)
-    enter_font = pygame.font.Font(None, 30)
+    enter_font = pygame.font.Font(None, 25)
 
     runnning = True
 
@@ -911,8 +950,8 @@ def final_window():
         asktext = ask_font.render('Спасибо за игру!', True, pygame.Color('#ffffff'))
         entertext = enter_font.render('Чтобы выйти, нажмите Enter', True, pygame.Color('#ffffff'))
 
-        screen.blit(asktext, (200, 200))
-        screen.blit(entertext, (250, 250))
+        screen.blit(asktext, (125, 150))
+        screen.blit(entertext, (180, 200))
 
         pygame.display.flip()
 
